@@ -127,9 +127,6 @@ if st.button("Search"):
             first_query_smile = multi_smiles_to_list(query_input)[0]
             pandas_output = run_vector_search(first_query_smile)
 
-            # For debugging with vanilla pandas
-            st.markdown("#### Without libxrender1 to render molecules")
-            st.dataframe(pandas_output)
         except Exception as e:
             st.error(f"Error with vector search: {e}")
 
@@ -143,5 +140,13 @@ if st.button("Search"):
 
         except Exception as e:
             st.error(f"Error with PandaTools: {e}")
+
+        try:
+            # For debugging with vanilla pandas
+            st.markdown("#### Without libxrender1 to render molecules")
+            st.dataframe(pandas_output)
+
+        except Exception as e:
+            st.error(f"Error: {e}")
     else:
         st.warning("Please enter a SMILES string")
