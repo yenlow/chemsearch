@@ -12,7 +12,7 @@ import distro
 import subprocess
 
 import rdkit
-from rdkit.Chem import MolFromSmiles, AllChem, Draw
+from rdkit.Chem import MolFromSmiles, AllChem
 from typing import List
 import streamlit as st
 
@@ -37,7 +37,7 @@ st.set_page_config(page_title="DrugBank Similarity Search", layout="wide")
 VECTOR_SEARCH_INDEX_NAME = "yen.qsar.drugbank_vs"
 col_display = ['id', 'name', 'smiles', 'molecular_weight']
 col_vector = ['ECFP']
-col_simscore = 'score'
+col_simscore = ['score']
 
 
 # Initialize Databricks SDK client
@@ -77,16 +77,10 @@ def run_vector_search(smiles: str) -> List:
             num_results=3,
         )
         return pd.DataFrame(query_result.result.data_array,
-                            columns=col_vector.append(col_simscore))
+                            columns=col_display + col_simscore)
     except Exception as e:
         logging.error(f"Error during vector search: {e}")
         return f"Error during vector search: {e}"
-
-
-def generate_random_dataframe():
-    # Generate a random DataFrame
-    df = pd.DataFrame(np.random.rand(10, 5), columns=list('ABCDE'))
-    return df
 
 
 def display_mol(smiles: str) -> str:
@@ -94,11 +88,11 @@ def display_mol(smiles: str) -> str:
     mol = MolFromSmiles(smiles)
     im = mols2grid.display([mol])
     html = im.data
-    #print(html)
     return html
 
 
 def mol2svg(smiles: str) -> str:
+    from rdkit.Chem import Draw
     smiles = multi_smiles_to_list(smiles)
     im = Draw.MolsToGridImage(
         [MolFromSmiles(mol) for mol in smiles],
@@ -126,11 +120,28 @@ if st.button("Search"):
             # If using MolsToGridImage
             img = mol2svg(query_input)
             st.image(img, caption='Molecule Grid', use_container_width=True)
-            # Display most similar molecules
-            pandas_output = run_vector_search(query_input[0])
+        except Exception as e:
+            st.error(f"Missing libxrender1 to render molecules {e}")
 
+        try:
+            first_query_smile = multi_smiles_to_list(query_input)[0]
+            pandas_output = run_vector_search(first_query_smile)
+
+            # For debugging with vanilla pandas
+            st.markdown("#### Without libxrender1 to render molecules")
             st.dataframe(pandas_output)
         except Exception as e:
-            st.error(f"Error processing SMILES: {e}")
+            st.error(f"Error with vector search: {e}")
+
+        try:
+            # If using PandasTools to render molecules
+            st.markdown("#### With libxrender1 to render molecules")
+            from rdkit.Chem import PandasTools
+            PandasTools.AddMoleculeColumnToFrame(pandas_output, 'smiles', 'Molecule')
+            pandas_html = re.sub(r'^<table', '<table width="100%"', pandas_output.to_html(escape=False))
+            st.markdown(pandas_html, unsafe_allow_html=True)
+
+        except Exception as e:
+            st.error(f"Error with PandaTools: {e}")
     else:
         st.warning("Please enter a SMILES string")
