@@ -1,0 +1,9 @@
+databricks-sdk==0.55.0
+rdkit==2025.3.2
+mols2grid==2.0.0
+streamlit==1.45.1
+distro
+#subprocess
+#platform
+#databricks-vectorsearch==0.56
+#gradio>=5.32

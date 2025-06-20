@@ -1,0 +1,11 @@
+command:
+- streamlit
+- run
+- app.py
+env:
+- name: VECTOR_SEARCH_ENDPOINT_NAME
+  value: drugbank_vs
+- name: VECTOR_SEARCH_INDEX_NAME
+  value: yen.qsar.drugbank_vs
+- name: LD_LIBRARY_PATH
+  value: /app/python/source_code/usr/lib
