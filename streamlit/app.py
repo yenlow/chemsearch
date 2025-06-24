@@ -14,7 +14,7 @@ import subprocess
 import rdkit
 from rdkit.Chem import MolFromSmiles, AllChem
 import pubchempy as pcp
-from typing import List
+from typing import List, Union
 import streamlit as st
 
 # Set up logging
@@ -56,7 +56,7 @@ def multi_inputs_to_list(inputs: str) -> List[str]:
     return input_list
 
 
-def input_to_pcpCompound(input: str) -> pcp.Compound:
+def input_to_pcpCompound(input: str) -> Union[pcp.Compound, str]:
     if input.isdigit():
         # if all integer => CID
         cid = int(input)
@@ -71,14 +71,22 @@ def input_to_pcpCompound(input: str) -> pcp.Compound:
         try:
             # if can be converted to a Mol => SMILES
             mol = MolFromSmiles(input, sanitize=False)
-            cpd = pcp.get_compounds(input, "smiles")[0]
+            cpd = pcp.get_compounds(input, "smiles")
+            if len(cpd) == 0:
+                logging.warning(f"{input} not found by SMILES in PubChem. This could be a new compound. Returning SMILES instead of a PubChem compound.")
+                return input
+            else:
+                return cpd[0]
             return cpd
         except:
             # Not CID or SMILES => name
             # then lookup SMILES by name
             try:
-                cpd = pcp.get_compounds(input, "name")[0]
-                return cpd
+                cpd = pcp.get_compounds(input, "name")
+                if len(cpd) == 0:
+                    raise Exception(f"{input} not found by name in PubChem. Please try another synonym, CID or SMILES.")
+                else:
+                    return cpd[0]
             except Exception as e:
                 raise Exception(
                     f"Failed to look up SMILES/name {input} in PubChem: {e}"
@@ -189,7 +197,7 @@ with st.container():
         )
 
     with col1:
-        query_input = st.text_input("Enter SMILES")
+        query_input = st.text_input("Enter SMILES, compound name or CID")
         search_button = st.button("Search")
 
         if search_button:
