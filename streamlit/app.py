@@ -21,10 +21,10 @@ print(distro.info())  # Ubuntu 22.04 jammy
 
 # Get current working directory
 sys.path.append(os.getcwd() + "/streamlit")
-print(f"Current Working Directory: os.getcwd()")
+print(f"Current Working Directory: {os.getcwd()}")
 
 # Load configuration
-config = load_config("config.yaml")
+config = load_config("streamlit/config.yaml")
 
 # Configuration variables from YAML
 if config:
