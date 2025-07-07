@@ -1,0 +1,24 @@
+# Configuration file for ChemSearch Streamlit App
+vector_search:
+  zinc:
+    name: "ZINC"
+    index: "yen.qsar.zinc_vs"
+    col_display: ["smiles", "zinc_id", "mwt", "logp", 
+                   "reactive", "purchasable", "tranche_name", 
+                   "qed", "SPS", "TPSA", "FractionCSP3", "RingCount"]
+    col_vector: ["ecfp"]
+    col_simscore: ["score"]
+  drugbank:
+    name: "DrugBank"
+    index: "yen.qsar.drugbank_vs"
+    col_display: ["id", "name", "smiles", "molecular_weight"]
+    col_vector: ["ECFP"]
+    col_simscore: ["score"]
+
+genie:
+  drugbank:
+    name: "DrugBank"
+    space_id: "01f057af51b815708ac0e9ae77e2c1e2"
+  zinc:
+    name: "ZINC"  
+    space_id: "01f0584b707915bcacba6e30fae5c178"
