@@ -14,13 +14,26 @@ from streamlit.components.v1 import html
 from utils import *
 from genie import GenieWrapper, GenieResponse
 
-# Load configuration
-config = load_config("config.yaml")
-
 logging.basicConfig(level=logging.ERROR)
 
 print(sys.version)  # 3.11
 print(distro.info())  # Ubuntu 22.04 jammy
+
+# Get current working directory
+cwd = os.getcwd()
+print(f"Current Working Directory: {cwd}")
+
+# List all files and directories in current directory
+print("\nFiles and directories in current directory:")
+for item in os.listdir(cwd):
+    item_path = os.path.join(cwd, item)
+    if os.path.isdir(item_path):
+        print(f"📁 {item}/")
+    else:
+        print(f"📄 {item}")
+
+# Load configuration
+config = load_config("config.yaml")
 
 # Configuration variables from YAML
 if config:
