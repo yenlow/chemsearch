@@ -187,6 +187,7 @@ def run_vector_search(
 
 
 st.set_page_config(page_title="ChemSearch", layout="wide")
+st.logo("streamlit/logo.svg", size="large", link=None)
 
 # Row 1: SMILES input and similarity slider
 col1, col2 = st.columns([1, 1], border=True)
